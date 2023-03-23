@@ -27,7 +27,7 @@ def idf(t, D):
     return log10(numerator/denominator)
 
 def tfidf(t, d, F):
-    # tf-idf 계산. t = 단어, d = (단어가 나온)문서, D = 비교할 문서집단
+    # tf-idf 계산. t = 단어, d = (단어가 나온)문서, F = 비교할 문서집단
     return tf(t,d)*idf(t, F)
 
 def tfidfScorer(D, F):
@@ -49,7 +49,7 @@ now = datetime.datetime.now()
 # MySQL Connection 연결
 sql_host = os.getenv("SQL_HOST")
 sql_user = os.getenv("SQL_USER")
-sql_password = os.getenv("SQL_PASSWORd")
+sql_password = os.getenv("SQL_PASSWORD")
 sql_db = os.getenv("SQL_DB")
 sql_port = int(os.getenv("SQL_PORT"))
 
@@ -104,7 +104,7 @@ insert_list = []
         '안정', '투표', '기구', '둔화', '신용', '당부', '차원', '촉진', '모두', '연결', '현황', '점검', '스타', '제약', '융합', '교통', '어머니', '한류', '토양', '속도', 
         '기록', '상당', '단계', '일보', '도움', '조정', '소속', '차례', '사고', '소재', '음반', '어린이', '새끼', '대명', '한화', '수도원', '전인대', '일자리', 
         '부채', '연속', '혜택', '여의도', '총리', '일정', '참가', '어려움', '목소리', '가구', '부문', '훈련', '맞춤', '접종', '왼쪽', '근로', '내부','블랙','한편','교회','씨앗','허브',
-        '충북', '영산포', '창경궁','그레이트','청주','잠실', '산둥성','광역시','러시아','아프리카','베스트','중남미','영국','시다','블록','체인','과학적','과학화','후미','교육청'
+        '충북', '영산포', '창경궁','그레이트','청주','잠실', '산둥성','광역시','러시아','아프리카','베스트','중남미','영국','시다','블록','체인','과학적','과학화','후미','교육청','경제계','이메일'
           ]
 for x in range(len(keywords)):
     keyword = keywords[x]
