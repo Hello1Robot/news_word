@@ -58,7 +58,7 @@ conn = pymysql.connect(host=sql_host, user=sql_user, password=sql_password, db=s
 curs = conn.cursor(pymysql.cursors.DictCursor)
 # SQL문 미리 작성해두기
 selectSql = "select word_id, word_name from word"
-insertSql = "insert into daily_word(category,word_id, created_at, updated_at) values (%s, %s, %s, %s)"
+insertSql = "insert into daily_word(category, word_id, score, created_at, updated_at) values (%s, %s, %s, %s, %s)"
 # 대조하기 위해서 DB에 저장된 전체 단어 리스트 꺼내오기
 curs.execute(selectSql)
 words = curs.fetchall()
@@ -105,12 +105,14 @@ insert_list = []
         '기록', '상당', '단계', '일보', '도움', '조정', '소속', '차례', '사고', '소재', '음반', '어린이', '새끼', '대명', '한화', '수도원', '전인대', '일자리', 
         '부채', '연속', '혜택', '여의도', '총리', '일정', '참가', '어려움', '목소리', '가구', '부문', '훈련', '맞춤', '접종', '왼쪽', '근로', '내부','블랙','한편','교회','씨앗','허브',
         '충북', '영산포', '창경궁','그레이트','청주','잠실', '산둥성','광역시','러시아','아프리카','베스트','중남미','영국','시다','블록','체인','과학적','과학화','후미','교육청','경제계','이메일'
-          ]
+        '군인'
+        ]
 for x in range(len(keywords)):
     keyword = keywords[x]
     db_cnt = 0
     page_num = 1
     category_list = defaultdict(float)
+    count_list = defaultdict(int)
     for i in range(1, lastpage * 10, 10):
         print(f"{page_num} page...")
         response = requests.get(f"https://search.naver.com/search.naver?where=news&sm=tab_jum&query={keyword}&start={i}&sort={new_flag}")
@@ -163,8 +165,9 @@ for x in range(len(keywords)):
                             NNG_list.append(i)
 
                     result = tfidfScorer(NNG_list, news_text) # tf-idf 값 추출
-                    for a, b in result[:30]:
+                    for a, b in result[:40]:
                         category_list[a] += b # tf-idf 값 더해주기
+                        count_list[a] += 1 # 카운트 값 세기
                 except:
                     print("tf-idf 오류")
 
@@ -187,19 +190,20 @@ for x in range(len(keywords)):
                 # print(k)
                 db_cnt += 1
                 결과.append(k)
-                insert_list.append((k, keyword, word['word_id']))
+                insert_list.append((k, keyword, word['word_id'], count_list[k]))
                 break
-        if db_cnt >= 5:
+        if db_cnt >= 20:
             break
         
 print()
 print()
+end = datetime.datetime.now()
 print(결과)
-for k, c, i in insert_list:
-    curs.execute(insertSql, (c, i, now, now))
+for k, c, i, cnt in insert_list:
+    curs.execute(insertSql, (c, i, cnt, end, end))
     conn.commit()
 
-end = datetime.datetime.now()
+
 
 print(f"경과한 시간 : {(end-now).seconds}초")
 # --------------------- 크롤링 파트 끝 ---------------------------- #
